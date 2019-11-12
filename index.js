@@ -124,7 +124,7 @@ ffmpegPlatform.prototype.createEventsSocket = function(cameraAccessory, cameraCo
 							timeoutVariable = setTimeout(function(){
 								cameraAccessory.getService(Service.MotionSensor).setCharacteristic(Characteristic.MotionDetected, false);
 								timeoutVariable = undefined;
-							}, 5000);
+							}, 1000);
 						}
 					}
 				}
