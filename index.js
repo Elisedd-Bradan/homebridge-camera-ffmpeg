@@ -69,15 +69,11 @@ ffmpegPlatform.prototype.didFinishLaunching = function() {
       }
 
       cameraAccessory.context.log = self.log;
+
       if (cameraConfig.motion) {
-        var button = new Service.Switch(cameraName);
-        cameraAccessory.addService(button);
 
         var motion = new Service.MotionSensor(cameraName);
         cameraAccessory.addService(motion);
-
-        button.getCharacteristic(Characteristic.On)
-          .on('set', _Motion.bind(cameraAccessory));
       }
 
       var cameraSource = new FFMPEG(hap, cameraConfig, self.log, videoProcessor, interfaceName);
@@ -120,7 +116,9 @@ ffmpegPlatform.prototype.createEventsSocket = function() {
 
 								var cmdmsg = realmsg.substr(6+mitem.eventcode.length);
 								//_onUDPEvent({"code":mitem.eventcode,"cmd":cmdmsg,"mitem":mitem});
-								_Motion(cmdmsg == "on" || cmdmsg == "1", function(){})
+
+								var on = cmdmsg == "on" || cmdmsg == "1";
+								self.getService(Service.MotionSensor).setCharacteristic(Characteristic.MotionDetected, (on ? 1 : 0));
 							}
 						}
 					}
@@ -139,19 +137,3 @@ ffmpegPlatform.prototype.createEventsSocket = function() {
 		}
 	}
 };
-
-function _Motion(on, callback) {
-  this.context.log("Setting %s Motion to %s", this.displayName, on);
-
-  this.getService(Service.MotionSensor).setCharacteristic(Characteristic.MotionDetected, (on ? 1 : 0));
-  if (on) {
-    setTimeout(_Reset.bind(this), 5000);
-  }
-  callback();
-}
-
-function _Reset() {
-  this.context.log("Setting %s Button to false", this.displayName);
-
-  this.getService(Service.Switch).setCharacteristic(Characteristic.On, false);
-}
