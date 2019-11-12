@@ -9,7 +9,7 @@ module.exports = function(homebridge) {
   Characteristic = homebridge.hap.Characteristic;
   UUIDGen = homebridge.hap.uuid;
 
-  homebridge.registerPlatform("homebridge-camera-ffmpeg", "Camera-ffmpeg", ffmpegPlatform, true);
+  homebridge.registerPlatform("homebridge-camera-ffmpeg-maio", "Camera-ffmpeg", ffmpegPlatform, true);
 }
 
 function ffmpegPlatform(log, config, api) {
