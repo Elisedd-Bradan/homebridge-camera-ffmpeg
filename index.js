@@ -92,6 +92,7 @@ ffmpegPlatform.prototype.didFinishLaunching = function() {
 ffmpegPlatform.prototype.createEventsSocket = function(cameraAccessory, cameraConfig) {
 
 	var self = this;
+	var timeoutVariable;
 
 	if ( typeof(cameraConfig.eventport) != 'undefined' ) {
 
@@ -111,8 +112,20 @@ ffmpegPlatform.prototype.createEventsSocket = function(cameraAccessory, cameraCo
 
 						var cmdmsg = realmsg.substr(6+cameraConfig.eventcode.length);
 
+						if ( typeof(timeoutVariable) != "undefined" ) {
+							clearTimeout(timeoutVariable);
+							timeoutVariable = undefined;
+						}
+
 						var on = cmdmsg == "on" || cmdmsg == "1";
 						cameraAccessory.getService(Service.MotionSensor).setCharacteristic(Characteristic.MotionDetected, (on ? 1 : 0));
+
+						if ( on ) {
+							timeoutVariable = setTimeout(function(){
+								cameraAccessory.getService(Service.MotionSensor).setCharacteristic(Characteristic.MotionDetected, false);
+								timeoutVariable = undefined;
+							}, 5000);
+						}
 					}
 				}
 			});
