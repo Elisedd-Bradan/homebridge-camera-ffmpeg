@@ -79,12 +79,12 @@ ffmpegPlatform.prototype.didFinishLaunching = function() {
       var cameraSource = new FFMPEG(hap, cameraConfig, self.log, videoProcessor, interfaceName);
       cameraAccessory.configureCameraSource(cameraSource);
       configuredAccessories.push(cameraAccessory);
+
+		// foreach camera create control socket if needed
+		self.createEventsSocket(cameraConfig);
     });
 
     self.api.publishCameraAccessories("Camera-ffmpeg-maio", configuredAccessories);
-
-	// foreach camera create control socket if needed
-	self.createEventsSocket(cameraConfig);
   }
 };
 
