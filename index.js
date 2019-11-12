@@ -80,8 +80,8 @@ ffmpegPlatform.prototype.didFinishLaunching = function() {
       cameraAccessory.configureCameraSource(cameraSource);
       configuredAccessories.push(cameraAccessory);
 
-		// foreach camera create control socket if needed
-		self.createEventsSocket(cameraConfig);
+      // foreach camera create control socket if needed
+      self.createEventsSocket(cameraAccessory, cameraConfig);
     });
 
     self.api.publishCameraAccessories("Camera-ffmpeg-maio", configuredAccessories);
@@ -89,7 +89,7 @@ ffmpegPlatform.prototype.didFinishLaunching = function() {
 };
 
 // create udp server for sensor receiving
-ffmpegPlatform.prototype.createEventsSocket = function(cameraConfig) {
+ffmpegPlatform.prototype.createEventsSocket = function(cameraAccessory, cameraConfig) {
 
 	var self = this;
 
@@ -112,7 +112,7 @@ ffmpegPlatform.prototype.createEventsSocket = function(cameraConfig) {
 						var cmdmsg = realmsg.substr(6+cameraConfig.eventcode.length);
 
 						var on = cmdmsg == "on" || cmdmsg == "1";
-						self.getService(Service.MotionSensor).setCharacteristic(Characteristic.MotionDetected, (on ? 1 : 0));
+						cameraAccessory.getService(Service.MotionSensor).setCharacteristic(Characteristic.MotionDetected, (on ? 1 : 0));
 					}
 				}
 			});
@@ -122,7 +122,7 @@ ffmpegPlatform.prototype.createEventsSocket = function(cameraConfig) {
 				self.server = undefined;
 				server.close();
 				setTimeout(function () {
-					self.createEventsSocket(cameraConfig);
+					self.createEventsSocket(cameraAccessory, cameraConfig);
 				}, 5000);
 			});
 
