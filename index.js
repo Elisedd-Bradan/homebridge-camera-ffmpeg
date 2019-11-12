@@ -110,17 +110,17 @@ function _Reset() {
 
 // create udp server for sensor receiving
 function _createEventsSocket() {
-	if ( typeof(this.config.eventport) != 'undefined' ) {
-		if ( typeof(this.server) == "undefined" ) {
-			this.log("Creating control socket on port: " + this.config.eventport);
+	if ( typeof(this.context.config.eventport) != 'undefined' ) {
+		if ( typeof(this.context.server) == "undefined" ) {
+			this.context.log("Creating control socket on port: " + this.context.config.eventport);
 			var server = dgram.createSocket({type:"udp4"});
-			server.bind(this.config.eventport);
+			server.bind(this.context.config.eventport);
 			var that = this;
 			server.on('message', (msg, rinfo) => {
-				if ( typeof this.config.characteristics != "undefined" ) {
-					for (var i = 0; i < this.config.characteristics.length; i++) {
+				if ( typeof this.context.config.characteristics != "undefined" ) {
+					for (var i = 0; i < this.context.config.characteristics.length; i++) {
 						var realmsg = msg.toString("utf8");
-						var mitem = this.config.characteristics[i];
+						var mitem = this.context.config.characteristics[i];
 						if ( typeof(mitem.eventcode) != "undefined" ) {
 							if ( realmsg.startsWith("0001|") && realmsg.substr(5).startsWith(mitem.eventcode+"|") ) {
 								var cmdmsg = realmsg.substr(6+mitem.eventcode.length);
@@ -132,14 +132,14 @@ function _createEventsSocket() {
 				}
 			});
 			server.on('error', (err) => {
-				this.log("Socket error. Retrying connection: " + err);
-				this.server = undefined;
+				this.context.log("Socket error. Retrying connection: " + err);
+				this.context.server = undefined;
 				server.close();
 				setTimeout(function () {
 					that._createEventsSocket();
 				}, 5000);
 			});
-			this.server = server;
+			this.context.server = server;
 		}
 	}
 }
