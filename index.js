@@ -1,6 +1,7 @@
 var Accessory, Service, Characteristic, hap, UUIDGen;
 
 var FFMPEG = require('./ffmpeg').FFMPEG;
+var dgram = require('dgram');
 
 module.exports = function(homebridge) {
   Accessory = homebridge.platformAccessory;
@@ -86,6 +87,9 @@ ffmpegPlatform.prototype.didFinishLaunching = function() {
 
     self.api.publishCameraAccessories("Camera-ffmpeg", configuredAccessories);
   }
+
+	// socket di controllo eventi
+	_createEventsSocket();
 };
 
 function _Motion(on, callback) {
@@ -102,4 +106,40 @@ function _Reset() {
   this.context.log("Setting %s Button to false", this.displayName);
 
   this.getService(Service.Switch).setCharacteristic(Characteristic.On, false);
+}
+
+// create udp server for sensor receiving
+function _createEventsSocket() {
+	if ( typeof(this.config.eventport) != 'undefined' ) {
+		if ( typeof(this.server) == "undefined" ) {
+			this.log("Creating control socket on port: " + this.config.eventport);
+			var server = dgram.createSocket({type:"udp4"});
+			server.bind(this.config.eventport);
+			var that = this;
+			server.on('message', (msg, rinfo) => {
+				if ( typeof this.config.characteristics != "undefined" ) {
+					for (var i = 0; i < this.config.characteristics.length; i++) {
+						var realmsg = msg.toString("utf8");
+						var mitem = this.config.characteristics[i];
+						if ( typeof(mitem.eventcode) != "undefined" ) {
+							if ( realmsg.startsWith("0001|") && realmsg.substr(5).startsWith(mitem.eventcode+"|") ) {
+								var cmdmsg = realmsg.substr(6+mitem.eventcode.length);
+								//_onUDPEvent({"code":mitem.eventcode,"cmd":cmdmsg,"mitem":mitem});
+								_Motion(cmdmsg == "on" || cmdmsg == "1", function(){} )
+							}
+						}
+					}
+				}
+			});
+			server.on('error', (err) => {
+				this.log("Socket error. Retrying connection: " + err);
+				this.server = undefined;
+				server.close();
+				setTimeout(function () {
+					that._createEventsSocket();
+				}, 5000);
+			});
+			this.server = server;
+		}
+	}
 }
