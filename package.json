@@ -1,5 +1,5 @@
 {
-  "name": "@tarokker/homebridge-camera-ffmpeg-maio",
+  "name": "homebridge-camera-ffmpeg-maio",
   "version": "0.1.14",
   "description": "ffmpeg plugin for homebridge: https://github.com/nfarina/homebridge",
   "license": "ISC",
