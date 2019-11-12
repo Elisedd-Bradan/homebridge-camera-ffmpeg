@@ -82,45 +82,37 @@ ffmpegPlatform.prototype.didFinishLaunching = function() {
     });
 
     self.api.publishCameraAccessories("Camera-ffmpeg-maio", configuredAccessories);
-  }
 
-	// socket di controllo eventi
-	self.createEventsSocket();
+	// foreach camera create control socket if needed
+	self.createEventsSocket(cameraConfig);
+  }
 };
 
 // create udp server for sensor receiving
-ffmpegPlatform.prototype.createEventsSocket = function() {
+ffmpegPlatform.prototype.createEventsSocket = function(cameraConfig) {
 
 	var self = this;
 
-	if ( typeof(self.config.eventport) != 'undefined' ) {
+	if ( typeof(cameraConfig.eventport) != 'undefined' ) {
 
 		if ( typeof(self.server) == "undefined" ) {
 
-			self.log("Creating control socket on port: " + self.config.eventport);
+			self.log("Creating control socket on port: " + cameraConfig.eventport);
 			var server = dgram.createSocket({type:"udp4"});
-			server.bind(self.config.eventport);
+			server.bind(cameraConfig.eventport);
 
 			server.on('message', (msg, rinfo) => {
 
-				if ( typeof self.config.characteristics != "undefined" ) {
+				var realmsg = msg.toString("utf8");
 
-					for (var i = 0; i < self.config.characteristics.length; i++) {
+				if ( typeof(cameraConfig.eventcode) != "undefined" ) {
 
-						var realmsg = msg.toString("utf8");
-						var mitem = self.config.characteristics[i];
+					if ( realmsg.startsWith("0001|") && realmsg.substr(5).startsWith(cameraConfig.eventcode+"|") ) {
 
-						if ( typeof(mitem.eventcode) != "undefined" ) {
+						var cmdmsg = realmsg.substr(6+cameraConfig.eventcode.length);
 
-							if ( realmsg.startsWith("0001|") && realmsg.substr(5).startsWith(mitem.eventcode+"|") ) {
-
-								var cmdmsg = realmsg.substr(6+mitem.eventcode.length);
-								//_onUDPEvent({"code":mitem.eventcode,"cmd":cmdmsg,"mitem":mitem});
-
-								var on = cmdmsg == "on" || cmdmsg == "1";
-								self.getService(Service.MotionSensor).setCharacteristic(Characteristic.MotionDetected, (on ? 1 : 0));
-							}
-						}
+						var on = cmdmsg == "on" || cmdmsg == "1";
+						self.getService(Service.MotionSensor).setCharacteristic(Characteristic.MotionDetected, (on ? 1 : 0));
 					}
 				}
 			});
@@ -130,9 +122,10 @@ ffmpegPlatform.prototype.createEventsSocket = function() {
 				self.server = undefined;
 				server.close();
 				setTimeout(function () {
-					self.createEventsSocket();
+					self.createEventsSocket(cameraConfig);
 				}, 5000);
 			});
+
 			self.server = server;
 		}
 	}
