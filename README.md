@@ -1,11 +1,11 @@
-# homebridge-camera-ffmpeg - MAIO FORM WITH UDP EVENTS (FOR SENSORS)
+# homebridge-camera-ffmpeg-maio - MAIO FORM WITH UDP EVENTS (FOR SENSORS)
 
 ffmpeg plugin for [Homebridge](https://github.com/nfarina/homebridge)
 
 ## Installation
 
 1. Install ffmpeg on your computer (note that in some cases, this requires compiling ffmpeg from scratch due to the use of rstp, namely for pi configurations)
-2. Install this plugin using: npm install -g homebridge-camera-ffmpeg
+2. Install this plugin using: npm install -g homebridge-camera-ffmpeg-maio
 3. Edit ``config.json`` and add the camera.
 3. Run Homebridge
 4. Add extra camera accessories in Home app. The setup code is the same as homebridge.
@@ -13,7 +13,7 @@ ffmpeg plugin for [Homebridge](https://github.com/nfarina/homebridge)
 ### Config.json Example
 
     {
-      "platform": "Camera-ffmpeg",
+      "platform": "Camera-ffmpeg-maio",
       "cameras": [
         {
           "name": "Camera Name",
@@ -42,7 +42,7 @@ Example with manufacturer, model, serial number and firmware set:
 
 ```
 {
-  "platform": "Camera-ffmpeg",
+  "platform": "Camera-ffmpeg-maio",
   "cameras": [
     {
       "name": "Camera Name",
@@ -86,7 +86,7 @@ A somewhat complicated example:
 
 ```
 {
-  "platform": "Camera-ffmpeg",
+  "platform": "Camera-ffmpeg-maio",
   "cameras": [
     {
       "name": "Camera Name",
@@ -116,7 +116,7 @@ A somewhat complicated example:
 
 ```
 {
-  "platform": "Camera-ffmpeg",
+  "platform": "Camera-ffmpeg-maio",
   "videoProcessor": "avconv",
   "cameras": [
     ...
@@ -126,7 +126,7 @@ A somewhat complicated example:
 
 ```
 {
-  "platform": "Camera-ffmpeg",
+  "platform": "Camera-ffmpeg-maio",
   "videoProcessor": "/my/own/compiled/ffmpeg",
   "cameras": [
     ...
@@ -140,7 +140,7 @@ A somewhat complicated example:
 
 ```
 {
-  "platform": "Camera-ffmpeg",
+  "platform": "Camera-ffmpeg-maio",
   "interfaceName": "bond0",
   "cameras": [
     ...

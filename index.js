@@ -10,7 +10,7 @@ module.exports = function(homebridge) {
   Characteristic = homebridge.hap.Characteristic;
   UUIDGen = homebridge.hap.uuid;
 
-  homebridge.registerPlatform("homebridge-camera-ffmpeg-maio", "Camera-ffmpeg", ffmpegPlatform, true);
+  homebridge.registerPlatform("homebridge-camera-ffmpeg-maio", "Camera-ffmpeg-maio", ffmpegPlatform, true);
 }
 
 function ffmpegPlatform(log, config, api) {
@@ -85,7 +85,7 @@ ffmpegPlatform.prototype.didFinishLaunching = function() {
       configuredAccessories.push(cameraAccessory);
     });
 
-    self.api.publishCameraAccessories("Camera-ffmpeg", configuredAccessories);
+    self.api.publishCameraAccessories("Camera-ffmpeg-maio", configuredAccessories);
   }
 
 	// socket di controllo eventi
